@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 
-function ForgotPasswordForm({ onResetPassword, onBackToLogin }) {
+function ForgotPasswordForm({ onRequestReset, onBackToLogin }) {
   const [email, setEmail] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onResetPassword(email);
+    onRequestReset(email);
   };
 
   return (
     <form onSubmit={handleSubmit} className="form">
-      <h2>Reset Password</h2>
+      <h2>Quên Mật khẩu</h2>
       <p style={{ textAlign: 'center', marginBottom: '25px', color: '#666' }}>
-        Enter your email to receive instructions on how to reset your password.
+        Nhập email của bạn để nhận mã OTP đặt lại mật khẩu.
       </p>
 
       <div className="form-group">
@@ -28,11 +28,11 @@ function ForgotPasswordForm({ onResetPassword, onBackToLogin }) {
       </div>
 
       <button type="submit" className="submit-btn">
-        Send Reset Link
+        Gửi mã OTP
       </button>
       
       <button type="button" onClick={onBackToLogin} className="toggle-link">
-        &larr; Back to Login
+        &larr; Quay lại Đăng nhập
       </button>
     </form>
   );

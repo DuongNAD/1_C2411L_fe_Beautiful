@@ -12,40 +12,27 @@ function OtpForm({ onVerify }) {
       setIsResendDisabled(false);
       return;
     }
-
     const interval = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
     }, 1000);
-
     return () => clearInterval(interval);
-
   }, [timer]);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const rs = await verifyAccout({ otp });
-      onVerify(otp);
-    } catch (err) {
-      setError(err.response?.data?.errors || "Mã OTP không hợp lệ.");
+    if(otp.length !== 6) {
+        setError("Mã OTP phải có 6 ký tự.");
+        return;
     }
+    setError("");
+    onVerify(otp);
   };
-
 
   const handleResendOtp = async () => {
     setError("");
     setIsResendDisabled(true);
     setTimer(300);
-
-    try {
-      await handleResendOtp();
-      console.log("Đang gửi lại mã OTP...");
-    }
-    catch (err) {
-      setError("Không thể gửi lại mã OTP. Vui lòng thử lại sau.");
-      setIsResendDisabled(false);
-    }
+    console.log("Đang gửi lại mã OTP...");
   }
 
   const formatTime = (seconds) => {
@@ -62,7 +49,6 @@ function OtpForm({ onVerify }) {
       <p style={{ textAlign: "center", marginBottom: "25px", color: "#666" }}>
         Mã OTP gồm 6 kí tự được gửi đến Gmail của bạn
       </p>
-
       <div className="form-group">
         <label htmlFor="otp">OTP Code</label>
         <input
@@ -75,17 +61,14 @@ function OtpForm({ onVerify }) {
           required
         />
       </div>
-
       {error && (
         <p className="error-message" style={{ color: "red", textAlign: "center", marginBottom: "15px" }}>
           {error}
         </p>
       )}
-
       <button type="submit" className="submit-btn">
         Xác nhận
       </button>
-
       <div className="resend-container" style={{ textAlign: "center", marginTop: "20px", color: "#666" }}>
         {timer > 0 ? (
           <p>Gửi lại mã sau: {formatTime(timer)}</p>
@@ -114,4 +97,3 @@ function OtpForm({ onVerify }) {
 }
 
 export default OtpForm;
-

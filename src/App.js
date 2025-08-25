@@ -1,39 +1,51 @@
-
 import React, { useState, useRef } from 'react';
-import { SwitchTransition, CSSTransition } from 'react-transition-group'; 
+import { SwitchTransition, CSSTransition } from 'react-transition-group';
 import './App.css';
 import RegisterForm from './RegisterForm';
 import LoginForm from './LoginForm';
 import OtpForm from './OtpForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
-
+import ResetPasswordForm from './ResetPasswordForm';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentView, setCurrentView] = useState('login');
-  
+  const [resetEmail, setResetEmail] = useState('');
+
   const nodeRef = useRef(null);
-  
+
   const handleLogin = () => setIsAuthenticated(true);
   const handleLogout = () => {
     setIsAuthenticated(false);
     setCurrentView('login');
   };
+
   const handleRegisterSuccess = () => setCurrentView('otp');
+
   const handleOtpVerification = (otpCode) => {
-    alert('Đăng ký thành công! Vui lòng đăng nhập.');
+    console.log(`Verifying OTP: ${otpCode}`);
+    if (currentView === 'otp') {
+      alert('Đăng ký thành công! Vui lòng đăng nhập.');
+      setCurrentView('login');
+    } 
+    else if (currentView === 'forgot-password-otp') { 
+      alert('Xác thực OTP thành công. Vui lòng tạo mật khẩu mới.');
+      setCurrentView('reset-password');
+    }
+  };
+
+  const handleRequestPasswordReset = (email) => { 
+    console.log(`Requesting password reset for: ${email}`);
+    setResetEmail(email);
+    setCurrentView('forgot-password-otp');
+  };
+
+  const handlePasswordReset = (newPassword) => {
+    console.log(`Resetting password for ${resetEmail} with new password: ${newPassword}`);
+    alert(`Mật khẩu cho tài khoản ${resetEmail} đã được đặt lại thành công!`);
     setCurrentView('login');
   };
 
-  const handleForgotPassword = () => {
-    setCurrentView('forgot-password');
-  };
-
-  const handleResetPassword = (email) => {
-    console.log(`Sending password reset link to: ${email}`);
-    alert(`Một liên kết đặt lại mật khẩu đã được gửi đến ${email}.`);
-    setCurrentView('login');
-  };
 
   if (isAuthenticated) {
     return (
@@ -52,7 +64,7 @@ function App() {
       case 'forgot-password':
         componentToRender = (
           <ForgotPasswordForm
-            onResetPassword={handleResetPassword}
+            onRequestReset={handleRequestPasswordReset} 
             onBackToLogin={() => setCurrentView('login')}
           />
         );
@@ -70,13 +82,19 @@ function App() {
       case 'otp':
         componentToRender = <OtpForm onVerify={handleOtpVerification} />;
         break;
+      case 'forgot-password-otp':
+        componentToRender = <OtpForm onVerify={handleOtpVerification} />; 
+        break;
+      case 'reset-password':
+        componentToRender = <ResetPasswordForm onResetPassword={handlePasswordReset} />;
+        break;
       case 'login':
       default:
         componentToRender = (
           <>
             <LoginForm
               onLogin={handleLogin}
-              onForgotPassword={handleForgotPassword}
+              onForgotPassword={() => setCurrentView('forgot-password')} 
             />
             <button onClick={() => setCurrentView('register')} className="toggle-link">
               Bạn chưa có tài khoản? Đăng ký
